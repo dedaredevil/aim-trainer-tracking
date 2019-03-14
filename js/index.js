@@ -14,10 +14,23 @@ let mouse = {
   y: undefined
 };
 
-const maxRadius = 40;
-const minRadius = 10;
-const maxDistance = 50;
-const growSpeed = 1;
+const maxRadius = 40
+const minRadius = 10
+const maxDistance = 50
+const growSpeed = 1
+let sTenths = 0
+const targetTimer = 8 // Tenths of a second
+const radius = 20
+const collisionBorder = radius * 5
+
+// Get Random Starting Positions //
+function xRandPos() {
+  return Math.random() * (canvas.width - radius * 2) + radius
+}
+
+function yRandPos() {
+  return Math.random() * (canvas.height - collisionBorder * 2) + collisionBorder
+}
 
 // Adding Mouse Event Listener //
 window.addEventListener("mousemove", function (event) {
@@ -25,18 +38,25 @@ window.addEventListener("mousemove", function (event) {
   mouse.y = event.y;
 });
 
+// Get Time in Seconds //
+function incrementTime() {
+  sTenths += 1
+}
+
+let cancel = setInterval(incrementTime, 100)
+
 // Circle Object //
-function Circle(x, y, xSpeed, ySpeed, radius) {
+function Circle(x, y, radius) {
   this.x = x;
   this.y = y;
-  this.xSpeed = xSpeed;
-  this.ySpeed = ySpeed;
   this.radius = radius;
-  let frameCounter = 0;
-  let seconds = 1;
   const directionChance = 0.4;
   let toggle = true;
-  let maxDistance = radius + 10;
+  let maxDistance = radius + 20;
+  let moveToX = xRandPos()
+  let moveToY = yRandPos()
+  const range = 5
+  const movementSpeed = 4
 
   this.draw = function () {
     ctx.beginPath();
@@ -46,28 +66,32 @@ function Circle(x, y, xSpeed, ySpeed, radius) {
 
   // Update Function //
   this.update = function () {
-    if (this.x + radius > innerWidth || this.x - this.radius < 0) {
-      this.xSpeed = -this.xSpeed;
-    }
 
-    if (this.y + radius > innerHeight || this.y - this.radius < 0) {
-      this.ySpeed = -this.ySpeed;
-    }
-
-    if (toggle) {
-      this.x += this.xSpeed;
-      this.y += this.ySpeed;
+    // Movement Update //
+    if (moveToX + range > this.x && this.x < moveToX - range) {
+      this.x += movementSpeed
+    } else if (moveToX + range < this.x && this.x > moveToX - range) {
+      this.x -= movementSpeed
     } else {
-      this.x -= this.xSpeed;
-      this.y -= this.ySpeed;
+      moveToX = xRandPos()
+    }
+
+    if (moveToY + range > this.y && this.y < moveToY - range) {
+      this.y += movementSpeed
+    } else if (moveToY + range < this.y && this.y > moveToY - range) {
+      this.y -= movementSpeed
+    } else {
+      moveToY = yRandPos()
     }
 
     // Random Chance to Change Direction //
-    frameCounter += 0.01;
-    if (Math.trunc(frameCounter) >= seconds) {
-      seconds += 1;
-
-      if (Math.random() < directionChance) toggle = !toggle;
+    if (sTenths >= targetTimer) {
+      sTenths = 0
+      if (Math.random() < directionChance) {
+        toggle = !toggle;
+        moveToX = xRandPos()
+        moveToY = yRandPos()
+      }
     }
 
     // Mouse Interactivity
@@ -87,7 +111,7 @@ function Circle(x, y, xSpeed, ySpeed, radius) {
 }
 
 // Creates a Beautiful Target //
-const circle = new Circle(200, 200, 4, 4, 20);
+const circle = new Circle(200, 200, 20);
 
 function animate() {
   requestAnimationFrame(animate);
