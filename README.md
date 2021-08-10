@@ -1,2 +1,2 @@
 # aim-trainer-tracking
-Improve your ability to track players in first person shooters like aimbot simply by aim training. 
+:computer_mouse: Boost your skills in FPS games with this aim trainer and learn to track like a pro! 
